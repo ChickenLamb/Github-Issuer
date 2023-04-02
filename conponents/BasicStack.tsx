@@ -7,10 +7,19 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
+import PositionedMenu from './PositionedMenu';
 
 interface Props {
-  Data: any;
+  Data: any,
+  token:string,
+  callback:(payload: FormData) => void
 }
+interface FormData{
+  title:string,
+  body:string,
+  open:boolean,
+    issue_url?:string
+ }
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -20,7 +29,8 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function BasicStack({ Data }: Props) {
+export default function BasicStack({ Data,token,callback }: Props) {
+  
   return (
     <Box sx={{ width: '100%' }}>
       <Stack spacing={2}>
@@ -33,7 +43,7 @@ export default function BasicStack({ Data }: Props) {
         <Button>Delete</Button>
        </Item> */}
         {Data.map((data: any, index: string) => (<Item key={index} style={{ minHeight: 200 }}>
-          <Typography ml={2} py={1} variant='body1' style={{ border: "1px solid black", width: "10%", minWidth: "10%", borderRadius: 5 }}>{data.state}</Typography>
+          <Typography ml={2} py={1} variant='body1' style={{ border: "1px solid black", width: "10%", minWidth: "fit-content", borderRadius: 5 }}>{PositionedMenu(data.state)}</Typography>
           <Stack direction="row"
             justifyContent="center"
             alignItems="center"
@@ -52,7 +62,7 @@ export default function BasicStack({ Data }: Props) {
 
 
               <Typography ml={2} my={1} textAlign={'left'} variant='body1'>{data.repository.name}</Typography>
-              <Typography ml={2} my={1} textAlign={'left'} variant='body1'>{data.body}</Typography></Container>
+              <Typography ml={2} my={1} textAlign={'left'} component="pre" variant='body1'>{data.body}</Typography></Container>
             <Container component={'div'}> <Stack
               direction="column"
               justifyContent="center"
@@ -60,7 +70,10 @@ export default function BasicStack({ Data }: Props) {
               spacing={1}
               style={{ border: "1px solid black" }}
 
-            ><Item elevation={0}><Button>Edit</Button></Item><Item elevation={0}><Button>Delete</Button></Item>
+            ><Item elevation={0}>
+              {/* <Button onClick={()=>UpdateData(data.comments_url)}>Edit</Button> */}
+              <Button onClick={()=>callback({body:(data.body),title:(data.title),open:true,issue_url:data.url})}>Edit</Button>
+              </Item><Item elevation={0}><Button>Delete</Button></Item>
             </Stack></Container>
           </Stack>
         </Item>))}
