@@ -1,13 +1,14 @@
 import Head from 'next/head'
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Container } from '@mui/system';
+import Button from '@mui/material/Button';
 import ButtonAppBar from '@/conponents/ButtonAppBar';
 import {useEffect, useRef, useState} from 'react'
 import BasicStack from '@/conponents/BasicStack';
-import BasicModal from '@/conponents/BasicModal';
+import UpdateModal from '@/conponents/Update_Modal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const axios = require('axios');
+
 const CLIENTID = "9413d76463c0af53a8a0";
 
  interface FormData{
@@ -18,6 +19,7 @@ const CLIENTID = "9413d76463c0af53a8a0";
  }
 
 export default function Home() {
+  const axios = require('axios');
   const shouldRender = useRef([true,true,true,true]);
   const [issues, setIssues] = useState<any>();
   const[access_token,setAccess_Token]=useState<string>("");
@@ -27,34 +29,7 @@ export default function Home() {
     setUpdate_Form(payload);
     shouldRender.current[3]=true;
 }
-const LoadIssue = async (reload:boolean) => {
-  if(reload === true){
-    const id = toast.loading("Fetching Issues...");
-    shouldRender.current[2]= true;
-    console.log("trigger reload");
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: 'https://api.github.com/issues',
-      headers: { 
-        'Accept': 'application/vnd.github+json', 
-        'Authorization': 'Bearer '+`${access_token}`
-      }
-    };
-    
-    await axios.request(config)
-    .then((response:any) => {
-      console.log((response.data));
-      window.history.forward();  //fix github_get_api getting old data, force browser clear cache
-      setIssues(response.data);
-      toast.update(id, {render: "Issues Loaded successfully", type: "success", isLoading: false, autoClose:2500});
-    })
-    .catch((error:any) => {
-      console.log(error);
-      toast.update(id, {render: "Something went wrong", type: "error", isLoading: false, autoClose:2500});
-    });
-  }
-}
+
 useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;console.log(update_form)}},[update_form]);
   useEffect(()=>{
     if(shouldRender.current[0]) {
@@ -95,6 +70,33 @@ useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;con
   },[access_token]);
   useEffect(()=>{if(shouldRender.current[2] && issues !== undefined) {
     shouldRender.current[2] = false;console.log("this is issue", issues)}},[issues]);
+    const LoadIssue = async (reload:boolean) => {
+      if(reload === true){
+        const id = toast.loading("Fetching Issues...");
+        shouldRender.current[2]= true;
+        console.log("trigger reload");
+        let config = {
+          method: 'get',
+          maxBodyLength: Infinity,
+          url: 'https://api.github.com/issues',
+          headers: { 
+            'Accept': 'application/vnd.github+json', 
+            'Authorization': 'Bearer '+`${access_token}`
+          }
+        };
+        
+        await axios.request(config)
+        .then((response:any) => {
+          console.log((response.data));
+          setIssues(response.data);
+          toast.update(id, {render: "Issues Loaded successfully", type: "success", isLoading: false, autoClose:2500});
+        })
+        .catch((error:any) => {
+          console.log(error);
+          toast.update(id, {render: "Something went wrong", type: "error", isLoading: false, autoClose:2500});
+        });
+      }
+    }
   return (
     <>
     <CssBaseline />
@@ -108,8 +110,9 @@ useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;con
         {/* <Box sx={{ bgcolor: '#cfe8fc', height: '100lvh' }} >
         </Box> */}
         <ButtonAppBar clientid={CLIENTID}/>
-        {issues!== undefined && <BasicStack Data={issues} token={access_token} callback={callback}/>}
-        <BasicModal updateForm={update_form} handleClose={handleClose} token={access_token} LoadIssue={LoadIssue}/>
+        <Button onClick={()=>{LoadIssue(true)}}>Refresh</Button>
+        {issues!== undefined && <BasicStack Data={issues} token={access_token} callback={callback} LoadIssue={LoadIssue}/>}
+        <UpdateModal updateForm={update_form} handleClose={handleClose} token={access_token} LoadIssue={LoadIssue}/>
         <ToastContainer
         position="top-right"
         autoClose={2500}

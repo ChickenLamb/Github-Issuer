@@ -8,11 +8,13 @@ import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import PositionedMenu from './PositionedMenu';
+import BasicModal from './BasicModal';
 
 interface Props {
   Data: any,
   token:string,
   callback:(payload: FormData) => void
+  LoadIssue:(state:boolean)=>void
 }
 interface FormData{
   title:string,
@@ -20,7 +22,10 @@ interface FormData{
   open:boolean,
     issue_url?:string
  }
-
+interface State{
+  window_state:boolean
+  close_url?:string
+}
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -29,8 +34,14 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function BasicStack({ Data,token,callback }: Props) {
-  
+export default function BasicStack({ Data,token,callback,LoadIssue }: Props) {
+  const [state, setState] = React.useState<State>({window_state:false});
+
+  function CloseIssue(url:string){
+    setState({window_state:true,close_url:url});
+    
+  }
+  // React.useEffect(()=>console.log(state),[state]);
   return (
     <Box sx={{ width: '100%' }}>
       <Stack spacing={2}>
@@ -43,7 +54,7 @@ export default function BasicStack({ Data,token,callback }: Props) {
         <Button>Delete</Button>
        </Item> */}
         {Data.map((data: any, index: string) => (<Item key={index} style={{ minHeight: 200 }}>
-          <Typography ml={2} py={1} variant='body1' style={{ border: "1px solid black", width: "10%", minWidth: "fit-content", borderRadius: 5 }}>{PositionedMenu(data.state)}</Typography>
+          <PositionedMenu state={data.state} labels={data.labels} />
           <Stack direction="row"
             justifyContent="center"
             alignItems="center"
@@ -73,11 +84,12 @@ export default function BasicStack({ Data,token,callback }: Props) {
             ><Item elevation={0}>
               {/* <Button onClick={()=>UpdateData(data.comments_url)}>Edit</Button> */}
               <Button onClick={()=>callback({body:(data.body),title:(data.title),open:true,issue_url:data.url})}>Edit</Button>
-              </Item><Item elevation={0}><Button>Delete</Button></Item>
+              </Item><Item elevation={0}><Button onClick={()=>CloseIssue(data.url)}>Delete</Button></Item>
             </Stack></Container>
           </Stack>
         </Item>))}
       </Stack>
+      <BasicModal state={state} setState={setState} token={token} LoadIssue={LoadIssue}/>
     </Box>
   );
 }
