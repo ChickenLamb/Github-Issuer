@@ -143,7 +143,7 @@ useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;con
         {/* <Box sx={{ bgcolor: '#cfe8fc', height: '100lvh' }} >
         </Box> */}
         <ButtonAppBar clientid={CLIENTID}/>
-        <TopBar LoadIssue={LoadIssue} setSortOrder={setSortOrder_callback} sortOrder={sortOrder}/>
+        <TopBar token={access_token} LoadIssue={LoadIssue} setSortOrder={setSortOrder_callback} sortOrder={sortOrder}/>
         {issues!== undefined && <BasicStack Data={issues} token={access_token} callback={callback} LoadIssue={LoadIssue}/>}
         <UpdateModal updateForm={update_form} handleClose={handleClose} token={access_token} LoadIssue={LoadIssue}/>
         <ToastContainer

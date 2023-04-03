@@ -8,7 +8,7 @@ import { AppBar, Typography, useTheme } from '@mui/material';
 import TextField from '@mui/material/TextField';
 
 interface Props {
-
+  token:string
   LoadIssue: (state: boolean) => void
   setSortOrder: (payload: string) => void
   sortOrder: string
@@ -25,27 +25,28 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 
-export default function TopBar({ LoadIssue, setSortOrder, sortOrder }: Props) {
+export default function TopBar({ token, LoadIssue, setSortOrder, sortOrder }: Props) {
 
-  const SearchField = () => <Box
-  component="form"
-  sx={{
-    '& > :not(style)': { m: 1.5 },
-  }}
-  style={{display:"flex"}}
-  ml={10}
-  noValidate
-  autoComplete="on"
->
-  <Typography textAlign={"left"}  variant="h6">Search:</Typography>
-  <TextField onChange={(e)=>{setQuery(e.target.value)}} value={query} id="outlined-basic" label="What do you want to find?" variant="outlined" />
-  {/* <TextField id="filled-basic" label="Filled" variant="filled" />
-<TextField id="standard-basic" label="Standard" variant="standard" /> */}
-  <Button onClick={()=>console.log(query)}>Search</Button>
-</Box>
+
 
   function Load_and_Sort(data: string) {
     setSortOrder(data);
+  }
+  function search_query(){
+    const axios = require('axios');
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://github-get-token-api.vercel.app/api/search-query?token='+`${token}`+'&query='+`${query}`,
+      
+    };
+    axios.request(config)
+    .then((response:any) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error:any) => {
+      console.log(error);
+    });
   }
   const [query, setQuery] = React.useState<string>("");
   const theme = useTheme();
@@ -57,7 +58,24 @@ export default function TopBar({ LoadIssue, setSortOrder, sortOrder }: Props) {
             <Item elevation={0}><Button onClick={() => LoadIssue(true)}>Refresh</Button></Item>
           </Grid>
           <Grid item xs={7}>
-            <Item elevation={0}><SearchField/></Item>
+            <Item elevation={0}>
+
+              <Box
+                component="form"
+                sx={{
+                  '& > :not(style)': { m: 1.5 },
+                }}
+                style={{ display: "flex" }}
+                ml={10}
+                noValidate
+                autoComplete="on"
+              >
+                <Typography textAlign={"left"} variant="h6">Search:</Typography>
+                <TextField onChange={(e) => { setQuery(e.target.value) }} value={query} id="outlined-basic" label="What do you want to find?" variant="outlined" />
+                <Button onClick={() => search_query()}>Search</Button>
+              </Box>
+
+            </Item>
           </Grid>
           <Grid item xs={3} style={{ display: "flex", gap: 1, justifyContent: "flex-end", alignItems: "flex-start" }}>
             <Item elevation={0}><Typography>Sort:</Typography></Item>
