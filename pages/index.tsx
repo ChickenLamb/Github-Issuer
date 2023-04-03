@@ -30,6 +30,8 @@ export default function Home() {
     setUpdate_Form(payload);
     shouldRender.current[3]=true;
 }
+const axios = require('axios');
+
 const setSortOrder_callback = (payload:string) => {
   setSortOrder(payload);
   shouldRender.current[4] = true;
@@ -42,10 +44,10 @@ const LoadIssue = async (reload:boolean) => {
     let config = {
       method: 'get',
       maxBodyLength: Infinity,
-      url: 'http://localhost:3001/api/get-issues-sort?token='+`${access_token}`+'&sort='+`${sortOrder}`,
+      url: 'https://github-get-token-api.vercel.app/api/get-issues-sort?token='+`${access_token}`+'&sort='+`${sortOrder}`,
       
     };
-    const axios = require('axios');
+
     await axios.request(config)
     .then((response:any) => {
       console.log((response));
@@ -59,16 +61,40 @@ const LoadIssue = async (reload:boolean) => {
   }
 }
 
+function validate_and_setToken(github_access_key:string){
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: 'https://github-get-token-api.vercel.app/api/validate?key='+`${github_access_key}`,
+    
+  };
+  
+  axios.request(config)
+.then((response:any) => {
+  if(response.status === 200){
+    setAccess_Token(github_access_key);
+    console.log("using local_key");
+  }
+})
+.catch((error:any) => {
+  localStorage.clear();
+});
+}
+
 useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;console.log(update_form)}},[update_form]);
   useEffect(()=>{
     if(shouldRender.current[0]) {
       shouldRender.current[0] = false;
       // 需要檢查token的有效期和儲存token到local
+      const github_access_key = (localStorage.getItem('github_access_key')??"");
+      validate_and_setToken(github_access_key);
+      
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       if((urlParams.get("code"))){
         let CODE = urlParams.get("code");
         // 移除param 'code' not done
+       
         console.log("code:"+CODE);
         let config = {
           method: 'post',
@@ -76,11 +102,11 @@ useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;con
           url: 'https://github-get-token-api.vercel.app/api/get?code='+`${CODE}`,
           
         };
-        const axios = require('axios');
         axios.request(config)
         .then((response:any) => {
           console.log(JSON.stringify(response.data));
           setAccess_Token(response.data.access_token);
+          localStorage.setItem('github_access_key', (response.data.access_token));
         })
         .catch((error:any) => {
           console.log(error);
@@ -88,19 +114,21 @@ useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;con
 
       };
     } 
-  },[])
-  useEffect(() => {if(shouldRender.current[4] && access_token !== "") {
-    shouldRender.current[4] = false;LoadIssue(true)}}, [sortOrder]);
-  useEffect(()=>{
-    if(shouldRender.current[1] && access_token !== "") {
-      shouldRender.current[1] = false;
-// 就算有access token 它也只會呼叫一次
-     
-      LoadIssue(true);
-    }
-  },[access_token]);
-  useEffect(()=>{if(shouldRender.current[2] && issues !== undefined) {
-    shouldRender.current[2] = false;console.log("this is issue", issues)}},[issues]);
+
+        },[]);
+
+        useEffect(() => {if(shouldRender.current[4] && access_token !== "") {
+          shouldRender.current[4] = false;LoadIssue(true)}}, [sortOrder]);
+        useEffect(()=>{
+          if(shouldRender.current[1] && access_token !== "") {
+            shouldRender.current[1] = false;
+      // 就算有access token 它也只會呼叫一次
+           
+            LoadIssue(true);
+          }
+        },[access_token]);
+        useEffect(()=>{if(shouldRender.current[2] && issues !== undefined) {
+          shouldRender.current[2] = false;console.log("this is issue", issues)}},[issues]);
 
   return (
     <>
