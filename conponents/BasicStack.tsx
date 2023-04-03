@@ -36,7 +36,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function BasicStack({ Data,token,callback,LoadIssue }: Props) {
   const [state, setState] = React.useState<State>({window_state:false});
-
+  let moment = require('moment'); // require
   function CloseIssue(url:string){
     setState({window_state:true,close_url:url});
     
@@ -72,7 +72,11 @@ export default function BasicStack({ Data,token,callback,LoadIssue }: Props) {
             </Stack>
 
 
-              <Typography ml={2} my={1} textAlign={'left'} variant='body1'>{data.repository.name}</Typography>
+              <Typography ml={2} my={1} textAlign={'left'} component="pre" variant='body1'>
+                <strong>repo: </strong>{data.repository.name} <strong>created_at: </strong>{moment(data.created_at).format("dddd, D/M/YYYY")}
+                {"\n"}
+                <strong>updated_at: </strong><cite>{moment(data.updated_at).format("dddd, D/M/YYYY, h:mm:ss a")}</cite>
+                </Typography>
               <Typography ml={2} my={1} textAlign={'left'} component="pre" variant='body1'>{data.body}</Typography></Container>
             <Container component={'div'}> <Stack
               direction="column"

@@ -1,13 +1,13 @@
 import Head from 'next/head'
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Container } from '@mui/system';
-import Button from '@mui/material/Button';
 import ButtonAppBar from '@/conponents/ButtonAppBar';
 import {useEffect, useRef, useState} from 'react'
 import BasicStack from '@/conponents/BasicStack';
 import UpdateModal from '@/conponents/Update_Modal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import TopBar from '@/conponents/TopBar';
 
 const CLIENTID = "9413d76463c0af53a8a0";
 
@@ -19,15 +19,44 @@ const CLIENTID = "9413d76463c0af53a8a0";
  }
 
 export default function Home() {
-  const axios = require('axios');
-  const shouldRender = useRef([true,true,true,true]);
+  
+  const shouldRender = useRef([true,true,true,true,true]);
   const [issues, setIssues] = useState<any>();
   const[access_token,setAccess_Token]=useState<string>("");
   const[update_form,setUpdate_Form]=useState<FormData>({open:false});
+  const[sortOrder,setSortOrder]=useState<string>("created");
   const handleClose = () => {setUpdate_Form({...update_form,open:false});shouldRender.current[3]=true;};
   const callback = (payload:FormData) => {
     setUpdate_Form(payload);
     shouldRender.current[3]=true;
+}
+const setSortOrder_callback = (payload:string) => {
+  setSortOrder(payload);
+  shouldRender.current[4] = true;
+}
+const LoadIssue = async (reload:boolean) => {
+  if(reload === true){
+    const id = toast.loading("Fetching Issues...");
+    shouldRender.current[2]= true;
+    console.log("trigger reload");
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:3001/api/get-issues-sort?token='+`${access_token}`+'&sort='+`${sortOrder}`,
+      
+    };
+    const axios = require('axios');
+    await axios.request(config)
+    .then((response:any) => {
+      console.log((response));
+      setIssues(response.data);
+      toast.update(id, {render: "Issues Loaded successfully", type: "success", isLoading: false, autoClose:2500});
+    })
+    .catch((error:any) => {
+      console.log(error);
+      toast.update(id, {render: "Something went wrong", type: "error", isLoading: false, autoClose:2500});
+    });
+  }
 }
 
 useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;console.log(update_form)}},[update_form]);
@@ -47,7 +76,7 @@ useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;con
           url: 'https://github-get-token-api.vercel.app/api/get?code='+`${CODE}`,
           
         };
-        
+        const axios = require('axios');
         axios.request(config)
         .then((response:any) => {
           console.log(JSON.stringify(response.data));
@@ -60,6 +89,8 @@ useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;con
       };
     } 
   },[])
+  useEffect(() => {if(shouldRender.current[4] && access_token !== "") {
+    shouldRender.current[4] = false;LoadIssue(true)}}, [sortOrder]);
   useEffect(()=>{
     if(shouldRender.current[1] && access_token !== "") {
       shouldRender.current[1] = false;
@@ -70,33 +101,7 @@ useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;con
   },[access_token]);
   useEffect(()=>{if(shouldRender.current[2] && issues !== undefined) {
     shouldRender.current[2] = false;console.log("this is issue", issues)}},[issues]);
-    const LoadIssue = async (reload:boolean) => {
-      if(reload === true){
-        const id = toast.loading("Fetching Issues...");
-        shouldRender.current[2]= true;
-        console.log("trigger reload");
-        let config = {
-          method: 'get',
-          maxBodyLength: Infinity,
-          url: 'https://api.github.com/issues',
-          headers: { 
-            'Accept': 'application/vnd.github+json', 
-            'Authorization': 'Bearer '+`${access_token}`
-          }
-        };
-        
-        await axios.request(config)
-        .then((response:any) => {
-          console.log((response.data));
-          setIssues(response.data);
-          toast.update(id, {render: "Issues Loaded successfully", type: "success", isLoading: false, autoClose:2500});
-        })
-        .catch((error:any) => {
-          console.log(error);
-          toast.update(id, {render: "Something went wrong", type: "error", isLoading: false, autoClose:2500});
-        });
-      }
-    }
+
   return (
     <>
     <CssBaseline />
@@ -110,7 +115,7 @@ useEffect(()=>{if(shouldRender.current[3]) {shouldRender.current[3] = false;;con
         {/* <Box sx={{ bgcolor: '#cfe8fc', height: '100lvh' }} >
         </Box> */}
         <ButtonAppBar clientid={CLIENTID}/>
-        <Button onClick={()=>{LoadIssue(true)}}>Refresh</Button>
+        <TopBar LoadIssue={LoadIssue} setSortOrder={setSortOrder_callback} sortOrder={sortOrder}/>
         {issues!== undefined && <BasicStack Data={issues} token={access_token} callback={callback} LoadIssue={LoadIssue}/>}
         <UpdateModal updateForm={update_form} handleClose={handleClose} token={access_token} LoadIssue={LoadIssue}/>
         <ToastContainer

@@ -2,6 +2,7 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import {useTheme } from '@mui/material';
 interface Props {
   state:string,
   labels:string[]
@@ -15,7 +16,7 @@ export default function PositionedMenu({state,labels}:Props) {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  const theme = useTheme();
   return (
     <div>
       <Button
@@ -43,7 +44,7 @@ export default function PositionedMenu({state,labels}:Props) {
             horizontal: 'left',
           }}
       >
-        {['Open','In Progress','Done'].map((data,index)=>{return <MenuItem key={index} style={{backgroundColor:data.toUpperCase()===state.toUpperCase()?"#000":"#FFF",color:data.toUpperCase()===state.toUpperCase()?"#FFF":"#000"}} onClick={handleClose}>{data}</MenuItem>})}
+        {['Open','In Progress','Done'].map((data,index)=>{return <MenuItem key={index} style={{backgroundColor:data.toUpperCase()===state.toUpperCase()?theme.palette.primary.main:theme.palette.common.white}} onClick={handleClose}>{data}</MenuItem>})}
       </Menu>
     </div>
   );
