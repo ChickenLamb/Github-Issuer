@@ -17,56 +17,69 @@ const style = {
   p: 4,
 };
 interface Props {
-    
-    state:State
-    setState:React.Dispatch<React.SetStateAction<State>>
-    token:string
-    LoadIssue:(state:boolean)=>void
+  query: Query
+  SearchQuery: (q: string) => Promise<void>
+  state: State
+  setState: React.Dispatch<React.SetStateAction<State>>
+  token: string
+  LoadIssue: (state: boolean) => void
 }
-interface State{
-    window_state:boolean
-    close_url?:string
-  }
-export default function BasicModal({state,setState,token,LoadIssue}:Props) {
-//   const [open, setOpen] = React.useState(false);
-//   const handleOpen = () => setOpen(true);
-  const handleClose = () => setState({...state,window_state:false});
-//   React.useEffect(()=>{if(state){setOpen(true)}else{setOpen(false)}},[state]);
-function CloseIssue(){
+interface State {
+  window_state: boolean
+  close_url?: string
+}
+interface Query {
+  state: boolean;
+  q: string;
+}
+export default function BasicModal({ query, SearchQuery, state, setState, token, LoadIssue }: Props) {
+  //   const [open, setOpen] = React.useState(false);
+  //   const handleOpen = () => setOpen(true);
+  const handleClose = () => setState({ ...state, window_state: false });
+  //   React.useEffect(()=>{if(state){setOpen(true)}else{setOpen(false)}},[state]);
+  function CloseIssue() {
     const id = toast.loading("Deleting...");
-     const axios = require('axios');
+    const axios = require('axios');
     let config = {
       method: 'patch',
       maxBodyLength: Infinity,
       url: state.close_url,
-      headers: { 
-        'Accept': 'application/vnd.github+json', 
-        'Authorization': 'Bearer '+`${token}`, 
-        'Content-Type': 'application/json', 
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': 'Bearer ' + `${token}`,
+        'Content-Type': 'application/json',
       },
-      data : {state:"close"}
+      data: { state: "close" }
     };
-    
+
     axios.request(config)
-    .then((response:any) => {
-      console.log(JSON.stringify(response.data));
-      
-      if(response.status === 200)
-      {
-        setState({...state,window_state:false});
-        toast.update(id, {render: "Deleted Successfully", type: "success", isLoading: false, autoClose:1500});
-                    setTimeout(()=>{LoadIssue(true)},1500);
-      }
-      
-    })
-    .catch((error:any) => {
-      console.log(error);
-      toast.update(id, {render: "Something went wrong", type: "error", isLoading: false, autoClose:2500});
-    });
-}
+      .then((response: any) => {
+        console.log(JSON.stringify(response.data));
+
+        if (response.status === 200) {
+          setState({ ...state, window_state: false });
+          toast.update(id, { render: "Deleted Successfully", type: "success", isLoading: false, autoClose: 1500 });
+          setTimeout(() => {
+            if (query.state) {
+              SearchQuery(query.q);
+            } else {
+              LoadIssue(true);
+            }
+
+
+
+          }, 1500);
+        }
+
+      })
+      .catch((error: any) => {
+        console.log(error);
+        toast.update(id, { render: "Something went wrong", type: "error", isLoading: false, autoClose: 2500 });
+      });
+  }
   return (
     <div>
-      
+
       <Modal
         open={state.window_state}
         onClose={handleClose}
@@ -77,10 +90,10 @@ function CloseIssue(){
           <Typography textAlign={"center"} id="modal-modal-title" variant="h6" component="h2">
             {"Are You Sure You Want To Delete It?".toUpperCase()}
           </Typography>
-         <Stack spacing={3}>
-            <Button onClick={()=>{CloseIssue()}}>CONFIRM</Button>
-            <Button onClick={()=>{handleClose()}}>CANCEL</Button>
-         </Stack>
+          <Stack spacing={3}>
+            <Button onClick={() => { CloseIssue() }}>CONFIRM</Button>
+            <Button onClick={() => { handleClose() }}>CANCEL</Button>
+          </Stack>
         </Box>
       </Modal>
     </div>

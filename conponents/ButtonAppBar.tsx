@@ -9,13 +9,13 @@ import MenuIcon from '@mui/icons-material/Menu';
 interface Props {
   clientid: string;
 }
-function GoToGithubLoginPage(path:string){
+function GoToGithubLoginPage(path: string) {
   window.location.assign(path);
 }
 
 export default function ButtonAppBar({ clientid }: Props) {
   const path = "https://github.com/login/oauth/authorize?client_id=" + clientid
-  +"&scope=repo"
+    + "&scope=repo"
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -32,8 +32,8 @@ export default function ButtonAppBar({ clientid }: Props) {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Github Issue Controller
           </Typography>
-          <Button color="inherit" onClick={()=>GoToGithubLoginPage(path)}>         
-              Login
+          <Button tabIndex={2} color="inherit" onClick={() => GoToGithubLoginPage(path)}>
+            Login
           </Button>
         </Toolbar>
       </AppBar>

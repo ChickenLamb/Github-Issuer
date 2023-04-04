@@ -2,12 +2,12 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 interface Props {
-  state:string,
-  labels:string[]
+  state: string,
+  labels: string[]
 }
-export default function PositionedMenu({state,labels}:Props) {
+export default function PositionedMenu({ state, labels }: Props) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -25,7 +25,7 @@ export default function PositionedMenu({state,labels}:Props) {
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
-        style={{float:'left'}}
+        style={{ float: 'left' }}
       >
         {state}
       </Button>
@@ -36,15 +36,15 @@ export default function PositionedMenu({state,labels}:Props) {
         open={open}
         onClose={handleClose}
         anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
       >
-        {['Open','In Progress','Done'].map((data,index)=>{return <MenuItem key={index} style={{backgroundColor:data.toUpperCase()===state.toUpperCase()?theme.palette.primary.main:theme.palette.common.white}} onClick={handleClose}>{data}</MenuItem>})}
+        {['Open', 'In Progress', 'Done'].map((data, index) => { return <MenuItem key={index} style={{ backgroundColor: data.toUpperCase() === state.toUpperCase() ? theme.palette.primary.main : theme.palette.common.white }} onClick={handleClose}>{data}</MenuItem> })}
       </Menu>
     </div>
   );

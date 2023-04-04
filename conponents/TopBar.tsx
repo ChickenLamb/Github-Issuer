@@ -7,8 +7,15 @@ import Button from '@mui/material/Button';
 import { AppBar, Typography, useTheme } from '@mui/material';
 import TextField from '@mui/material/TextField';
 
+interface Query {
+  state: boolean;
+  q: string;
+}
+
 interface Props {
-  token:string
+  setQuery: (payload: Query) => void
+  setIssues: (payload: any) => void
+  token: string
   LoadIssue: (state: boolean) => void
   setSortOrder: (payload: string) => void
   sortOrder: string
@@ -25,36 +32,34 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 
-export default function TopBar({ token, LoadIssue, setSortOrder, sortOrder }: Props) {
+export default function TopBar({ setQuery, setIssues, token, LoadIssue, setSortOrder, sortOrder }: Props) {
 
 
 
   function Load_and_Sort(data: string) {
-    setSortOrder(data);
+
+      setSortOrder(data);
   }
-  function search_query(){
-    const axios = require('axios');
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: 'https://github-get-token-api.vercel.app/api/search-query?token='+`${token}`+'&query='+`${query}`,
-      
-    };
-    axios.request(config)
-    .then((response:any) => {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch((error:any) => {
-      console.log(error);
-    });
-  }
-  const [query, setQuery] = React.useState<string>("");
+  const [q, setQ] = React.useState<string>("");
   const theme = useTheme();
+  const Enter_Search = (e:React.KeyboardEvent<HTMLElement>) =>{
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      // Do code here
+      search();
+    }
+  }
+  function search(){
+    setQuery({ state: true, q: q })
+  }
+  function clear_search(){
+    setQuery({ state: false, q: "" }); setQ("") 
+  }
   return (
     <AppBar position='sticky'>
       <Box style={{ backgroundColor: theme.palette.common.white }} sx={{ flexGrow: 1 }}>
         <Grid container spacing={0}>
-          <Grid style={{}} item xs={2}>
+          <Grid item xs={2}>
             <Item elevation={0}><Button onClick={() => LoadIssue(true)}>Refresh</Button></Item>
           </Grid>
           <Grid item xs={7}>
@@ -71,8 +76,9 @@ export default function TopBar({ token, LoadIssue, setSortOrder, sortOrder }: Pr
                 autoComplete="on"
               >
                 <Typography textAlign={"left"} variant="h6">Search:</Typography>
-                <TextField onChange={(e) => { setQuery(e.target.value) }} value={query} id="outlined-basic" label="What do you want to find?" variant="outlined" />
-                <Button onClick={() => search_query()}>Search</Button>
+                <TextField onKeyDown={Enter_Search}  onChange={(e) => { setQ(e.target.value) }} value={q} id="outlined-basic" label="What do you want to find?" variant="outlined" />
+                <Button onClick={() => search()}>Search</Button>
+                <Button onClick={() => {clear_search()}}>Clear Search</Button>
               </Box>
 
             </Item>
