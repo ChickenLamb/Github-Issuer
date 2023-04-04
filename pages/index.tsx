@@ -242,7 +242,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container style={{backgroundColor:theme.palette.secondary.main}} maxWidth="xl" disableGutters={true}>
+      <Container style={{backgroundColor:theme.palette.secondary.main, minHeight:"100vh", minWidth:"1130px"}} maxWidth="xl" disableGutters={true}>
         {/* <Box sx={{ bgcolor: '#cfe8fc', height: '100lvh' }} >
         </Box> */}
         <ButtonAppBar clientid={CLIENTID} />
