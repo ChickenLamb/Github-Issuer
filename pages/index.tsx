@@ -8,7 +8,7 @@ import UpdateModal from '@/conponents/Update_Modal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import TopBar from '@/conponents/TopBar';
-
+import { useTheme } from '@mui/material';
 const CLIENTID = "9413d76463c0af53a8a0";
 
 interface FormData {
@@ -35,6 +35,7 @@ interface Query {
   q: string;
 }
 export default function Home() {
+  const theme = useTheme();
   const axios = require('axios');
   const shouldRender = useRef([true, true, true, true, true, false]);
   const [query, setQuery] = useState<Query>({ state: false, q: "" });
@@ -241,7 +242,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container maxWidth="xl" disableGutters={true}>
+      <Container style={{backgroundColor:theme.palette.secondary.main}} maxWidth="xl" disableGutters={true}>
         {/* <Box sx={{ bgcolor: '#cfe8fc', height: '100lvh' }} >
         </Box> */}
         <ButtonAppBar clientid={CLIENTID} />

@@ -62,7 +62,7 @@ export default function BasicStack({ query, SearchQuery, Data, token, callback, 
   }
   // React.useEffect(()=>console.log(state),[state]);
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box maxWidth={'md'} m={"auto"} py={5} sx={{ width: '100%' }}>
       <Stack spacing={2}>
         {/* <Item style={{minHeight:200}}>
         <Typography variant='body1' style={{border:"1px solid black"}}>Open</Typography>
