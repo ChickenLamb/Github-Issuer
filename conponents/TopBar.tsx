@@ -6,6 +6,7 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { AppBar, Typography, useTheme } from '@mui/material';
 import TextField from '@mui/material/TextField';
+import ToggleButtons from './ToggleButtons';
 
 interface Query {
   state: boolean;
@@ -61,6 +62,7 @@ export default function TopBar({ setQuery, setIssues, token, LoadIssue, setSortO
         <Grid container spacing={0}>
           <Grid item xs={2}>
             <Item elevation={0}><Button onClick={() => LoadIssue(true)}>Refresh</Button></Item>
+            <Item elevation={0}><ToggleButtons/></Item>
           </Grid>
           <Grid item xs={7}>
             <Item elevation={0}>
