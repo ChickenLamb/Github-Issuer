@@ -99,7 +99,7 @@ export default function TopBar({ tag, setTag, setQuery, setIssues, token, LoadIs
                 autoComplete="on"
               >
                 <Typography textAlign={"left"} variant="h6">
-                  Selected Label:
+                  Selected Label :{" "}
                   <Chip label={tag}
                     onDelete={() => setTag("")}
                   />

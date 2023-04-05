@@ -142,6 +142,7 @@ export default function PositionedMenu({ setTag, query, SearchQuery, LoadIssue, 
           vertical: 'bottom',
           horizontal: 'left',
         }}
+        style={{marginLeft:3}}
       >
         {['Open', 'In Progress', 'Done']?.map((data, index) => { return <Button key={index} onClick={() => AddTags(labels_url, data)}>{data}</Button> })}
         {/* {['Open', 'In Progress', 'Done'].map((data, index) => { return <MenuItem key={index} style={{ backgroundColor: data.toUpperCase() === state.toUpperCase() ? theme.palette.primary.main : theme.palette.common.white }} onClick={handleClose}>{data}</MenuItem> })} */}
