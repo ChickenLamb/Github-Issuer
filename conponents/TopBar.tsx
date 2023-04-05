@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import { AppBar, Typography, useTheme } from '@mui/material';
+import { AppBar, Chip, Typography, useTheme } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import StandaloneToggleButton from './ToggleButtons';
 
@@ -14,6 +14,8 @@ interface Query {
 }
 
 interface Props {
+  tag: string
+  setTag: (payload: string) => void
   setQuery: (payload: Query) => void
   setIssues: (payload: any) => void
   token: string
@@ -33,28 +35,28 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 
-export default function TopBar({ setQuery, setIssues, token, LoadIssue, setSortOrder, sortOrder }: Props) {
+export default function TopBar({ tag, setTag, setQuery, setIssues, token, LoadIssue, setSortOrder, sortOrder }: Props) {
 
 
 
   function Load_and_Sort(data: string) {
 
-      setSortOrder(data);
+    setSortOrder(data);
   }
   const [q, setQ] = React.useState<string>("");
   const theme = useTheme();
-  const Enter_Search = (e:React.KeyboardEvent<HTMLElement>) =>{
+  const Enter_Search = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       // Do code here
       search();
     }
   }
-  function search(){
+  function search() {
     setQuery({ state: true, q: q })
   }
-  function clear_search(){
-    setQuery({ state: false, q: "" }); setQ("") 
+  function clear_search() {
+    setQuery({ state: false, q: "" }); setQ("")
   }
   return (
     <AppBar position='sticky'>
@@ -62,7 +64,7 @@ export default function TopBar({ setQuery, setIssues, token, LoadIssue, setSortO
         <Grid container spacing={0}>
           <Grid item xs={2}>
             <Item elevation={0}><Button onClick={() => LoadIssue(true)}>Refresh</Button></Item>
-            <Item elevation={0}><StandaloneToggleButton/></Item>
+            <Item elevation={0}><StandaloneToggleButton /></Item>
           </Grid>
           <Grid item xs={7}>
             <Item elevation={0}>
@@ -78,10 +80,33 @@ export default function TopBar({ setQuery, setIssues, token, LoadIssue, setSortO
                 autoComplete="on"
               >
                 <Typography textAlign={"left"} variant="h6">Search:</Typography>
-                <TextField onKeyDown={Enter_Search}  onChange={(e) => { setQ(e.target.value) }} value={q} id="outlined-basic" label="What do you want to find?" variant="outlined" />
+                <TextField onKeyDown={Enter_Search} onChange={(e) => { setQ(e.target.value) }} value={q} id="outlined-basic" label="What do you want to find?" variant="outlined" />
                 <Button onClick={() => search()}>Search</Button>
-                <Button onClick={() => {clear_search()}}>Clear Search</Button>
+                <Button onClick={() => { clear_search() }}>Clear Search</Button>
               </Box>
+
+            </Item>
+            <Item elevation={0}>
+
+              {tag!=="" && <Box
+                component="form"
+                sx={{
+                  '& > :not(style)': { m: 1.5 },
+                }}
+                style={{ display: "flex" }}
+                ml={10}
+                noValidate
+                autoComplete="on"
+              >
+                <Typography textAlign={"left"} variant="h6">
+                  Selected Label:
+                  <Chip label={tag}
+                    onDelete={() => setTag("")}
+                  />
+
+                </Typography>
+
+              </Box>}
 
             </Item>
           </Grid>

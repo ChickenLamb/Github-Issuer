@@ -9,10 +9,11 @@ import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import PositionedMenu from './PositionedMenu';
+import { useTheme } from '@mui/material';
 import BasicModal from './BasicModal';
 interface Issue {
   state: string;
-  labels: string[];
+  labels: Label[];
   assignee_name: string;
   assignee_avatar_url: string;
   repository_name: string;
@@ -22,8 +23,16 @@ interface Issue {
   title: string;
   body: string;
   html_url: string;
+  labels_url: string;
+}
+interface Label {
+  color: string
+  description: string
+  name: string
+  url: string
 }
 interface Props {
+  setTag:(payload: string) => void
   query: Query
   SearchQuery: (q: string) => Promise<void>
   Data: Issue[],
@@ -53,7 +62,8 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function BasicStack({ query, SearchQuery, Data, token, callback, LoadIssue }: Props) {
+export default function BasicStack({setTag, query, SearchQuery, Data, token, callback, LoadIssue }: Props) {
+  const theme = useTheme();
   const [state, setState] = React.useState<State>({ window_state: false });
   let moment = require('moment'); // require
   function CloseIssue(url: string) {
@@ -73,7 +83,7 @@ export default function BasicStack({ query, SearchQuery, Data, token, callback, 
         <Button>Delete</Button>
        </Item> */}
         {Data.map((data: Issue, index: number) => (<Item key={index} style={{ minHeight: 200 }}>
-          <PositionedMenu state={data.state} labels={data.labels} />
+          <PositionedMenu setTag={setTag} query={query} SearchQuery={SearchQuery} LoadIssue={LoadIssue} token={token} labels_url={data.labels_url} state={data.state} labels={data.labels} />
           <Stack direction="row"
             justifyContent="center"
             alignItems="center"
@@ -94,11 +104,12 @@ export default function BasicStack({ query, SearchQuery, Data, token, callback, 
 
 
               <Typography ml={2} my={1} textAlign={'left'} component="pre" variant='body1'>
-                <strong>repo: </strong>{data.repository_name} <strong>created_at: </strong>{moment(data.date_created_at).format("dddd, D/M/YYYY")}
+                <strong>repo: </strong><Typography p={1} style={{ borderRadius: 5, color: theme.palette.common.white, backgroundColor: theme.palette.common.black }} ml={1} mr={2} my={1} textAlign={'center'} component="span" variant='body1'>{data.repository_name}</Typography> <strong>created_at: </strong>{moment(data.date_created_at).format("dddd, D/M/YYYY")}
+                {"\n"}
                 {"\n"}
                 <strong>updated_at: </strong><cite>{moment(data.date_updated_at).format("dddd, D/M/YYYY, h:mm:ss a")}</cite>
               </Typography>
-              <Typography ml={2} my={1} textAlign={'left'} component="pre" variant='body1'>{data.body}</Typography></Container>
+              <Typography style={{whiteSpace:"break-spaces"}} ml={2} my={1} textAlign={'left'} component="pre" variant='body1'>{data.body}</Typography></Container>
             <Container component={'div'}> <Stack
               direction="column"
               justifyContent="center"

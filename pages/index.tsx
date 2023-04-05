@@ -19,7 +19,7 @@ interface FormData {
 }
 interface Issue {
   state: string;
-  labels: string[];
+  labels: Label[];
   assignee_name: string;
   assignee_avatar_url: string;
   repository_name: string;
@@ -29,6 +29,13 @@ interface Issue {
   title: string;
   body: string;
   html_url: string;
+  labels_url:string;
+}
+interface Label {
+  color :string
+  description :string
+  name:string
+  url:string
 }
 interface Query {
   state: boolean;
@@ -37,7 +44,8 @@ interface Query {
 export default function Home() {
   const theme = useTheme();
   const axios = require('axios');
-  const shouldRender = useRef([true, true, true, true, true, false]);
+  const shouldRender = useRef([true, true, true, true, true, false,false]);
+  const [tag, setTag] = useState<string>("");
   const [query, setQuery] = useState<Query>({ state: false, q: "" });
   const [issues, setIssues] = useState<Issue[]>();
   const [access_token, setAccess_Token] = useState<string>("");
@@ -48,7 +56,10 @@ export default function Home() {
     setUpdate_Form(payload);
     shouldRender.current[3] = true;
   }
-
+  const setTag_callback = (payload: string) => {
+    setTag(payload);
+    shouldRender.current[6] = true;
+  }
   const setIssue_callback = (payload: any) => {
     setIssues(payload);
   }
@@ -68,7 +79,7 @@ export default function Home() {
       let config = {
         method: 'get',
         maxBodyLength: Infinity,
-        url: 'https://github-get-token-api.vercel.app/api/get-issues-sort?token=' + `${access_token}` + '&sort=' + `${sortOrder}`,
+        url: 'https://github-get-token-api.vercel.app/api/get-issues-sort?token=' + `${access_token}` + '&sort=' + `${sortOrder}`+'&tag='+`${tag}`,
 
       };
 
@@ -76,9 +87,15 @@ export default function Home() {
         .then((response: any) => {
           console.log((response));
           const data = response.data.map((data: any) => {
+            const labels_data = data.labels.map((data:any)=>{return{
+              color :data.color,
+              description :data.description,
+              name:data.name,
+              url:data.url
+            }})
             return {
               state: data.state,
-              labels: data.labels,
+              labels:labels_data,
               assignee_name: data.assignee.login,
               assignee_avatar_url: data.assignee.avatar_url,
               repository_name: data.repository.name,
@@ -87,7 +104,8 @@ export default function Home() {
               url: data.url,
               title: data.title,
               body: data.body,
-              html_url: data.html_url
+              html_url: data.html_url,
+              labels_url:data.labels_url.replace('{/name}','')
             }
           })
           setIssues(data);
@@ -108,7 +126,7 @@ export default function Home() {
     let config = {
       method: 'get',
       maxBodyLength: Infinity,
-      url: 'https://github-get-token-api.vercel.app/api/search-query?token=' + `${access_token}` + '&query=' + `${q}`+ '&sort=' + `${sortOrder}`,
+      url: 'https://github-get-token-api.vercel.app/api/search-query?token=' + `${access_token}` + '&query=' + `${q}` + '&sort=' + `${sortOrder}`+'&tag='+`${tag}`,
 
     };
 
@@ -116,9 +134,15 @@ export default function Home() {
       .then((response: any) => {
         console.log((response.data.items));
         const data = response.data.items.map((data: any) => {
+          const labels_data = data.labels.map((data:any)=>{return{
+            color :data.color,
+            description :data.description,
+            name:data.name,
+            url:data.url
+          }})
           return {
             state: data.state,
-            labels: data.labels,
+            labels: labels_data,
             assignee_name: data.assignee.login,
             assignee_avatar_url: data.assignee.avatar_url,
             repository_name: data.repository_url.substring(data.repository_url.lastIndexOf('/') + 1),
@@ -127,7 +151,8 @@ export default function Home() {
             url: data.url,
             title: data.title,
             body: data.body,
-            html_url: data.html_url
+            html_url: data.html_url,
+            labels_url:data.labels_url.replace('{/name}','')
           }
         })
         setIssues(data);
@@ -176,7 +201,7 @@ export default function Home() {
 
         console.log("code:" + CODE);
         let config = {
-          method: 'post',
+          method: 'get',
           maxBodyLength: Infinity,
           url: 'https://github-get-token-api.vercel.app/api/get?code=' + `${CODE}`,
 
@@ -199,10 +224,10 @@ export default function Home() {
   useEffect(() => {
     if (shouldRender.current[4] && access_token !== "") {
       shouldRender.current[4] = false;
-      if(query.state){
+      if (query.state) {
         SearchQuery(query.q);
       }
-      else{
+      else {
         LoadIssue(true)
       }
     }
@@ -233,6 +258,19 @@ export default function Home() {
 
     }
   }, [query]);
+  useEffect(() => {
+    if (shouldRender.current[6]) {
+      shouldRender.current[6] = false;
+
+      if (query.q !== "" && query.state) {
+        SearchQuery(query.q);
+      }
+      else {
+        LoadIssue(true);
+      }
+
+    }
+  }, [tag]);
   return (
     <>
       <CssBaseline />
@@ -242,12 +280,12 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container style={{backgroundColor:theme.palette.secondary.main, minHeight:"100vh", minWidth:"1130px"}} maxWidth="xl" disableGutters={true}>
+      <Container style={{ backgroundColor: theme.palette.secondary.main, minHeight: "100vh", minWidth: "1130px" }} maxWidth="xl" disableGutters={true}>
         {/* <Box sx={{ bgcolor: '#cfe8fc', height: '100lvh' }} >
         </Box> */}
         <ButtonAppBar clientid={CLIENTID} />
-        <TopBar setQuery={setQuery_callback} setIssues={setIssue_callback} token={access_token} LoadIssue={LoadIssue} setSortOrder={setSortOrder_callback} sortOrder={sortOrder} />
-        {issues !== undefined && <BasicStack query={query} SearchQuery={SearchQuery} Data={issues} token={access_token} callback={callback} LoadIssue={LoadIssue} />}
+        <TopBar tag={tag} setTag={setTag_callback} setQuery={setQuery_callback} setIssues={setIssue_callback} token={access_token} LoadIssue={LoadIssue} setSortOrder={setSortOrder_callback} sortOrder={sortOrder} />
+        {issues !== undefined && <BasicStack setTag={setTag_callback} query={query} SearchQuery={SearchQuery} Data={issues} token={access_token} callback={callback} LoadIssue={LoadIssue} />}
         <UpdateModal query={query} SearchQuery={SearchQuery} updateForm={update_form} handleClose={handleClose} token={access_token} LoadIssue={LoadIssue} />
         <ToastContainer
           position="top-right"

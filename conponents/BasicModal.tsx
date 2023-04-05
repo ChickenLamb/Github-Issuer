@@ -74,7 +74,7 @@ export default function BasicModal({ query, SearchQuery, state, setState, token,
       })
       .catch((error: any) => {
         console.log(error);
-        toast.update(id, { render: "Something went wrong", type: "error", isLoading: false, autoClose: 2500 });
+        toast.update(id, { render: "Failed to Delete", type: "error", isLoading: false, autoClose: 2500 });
       });
   }
   return (

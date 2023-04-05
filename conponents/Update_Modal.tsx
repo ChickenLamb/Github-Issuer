@@ -72,7 +72,7 @@ export default function UpdateModal({ query, SearchQuery, updateForm, handleClos
                 })
                 .catch((error: any) => {
                     console.log(error);
-                    toast.update(id, { render: "Something went wrong", type: "error", isLoading: false, autoClose: 2500 });
+                    toast.update(id, { render: "Failed to Update", type: "error", isLoading: false, autoClose: 2500 });
                 });
         }
         else {
