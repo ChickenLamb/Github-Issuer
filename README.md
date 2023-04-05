@@ -30,3 +30,44 @@
 #### 1.身份鑰匙丟失
 儅刷新頁面（Ctrl+R）時若尾部有``?code=35afd147584ea5bd3847``,會載入失敗且丟失登入鑰匙的暫存，需要移除
 ``?code=35afd147584ea5bd3847``的狀況下重新載入，才會運作正常（使用電腦上的暫存鑰匙，身份未過期前都不需要向github拿鑰匙或做重新登入的動作，無限次刷新都不會丟失身份）。
+
+## 網頁流程與鏈接
+
+1.[NextJs(ClientSideRendering Mode)](https://github.com/ChickenLamb/Github-Issuer) ——>static file->CDN
+2.CDN->client->[MiddlewareAPI(to resolve CORS)](https://github.com/ChickenLamb/Github-Get-Token-API)->githubAPI
+3.github o-auth->redirect to domain(localhost:3000 or CDN hosting domain)
+
+
+
+
+## Installation/如何本地運行
+#### 需要的工具
+[npm and Node.js](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+
+Install Github-Issuer with npm
+\
+Open Prompt:
+### build and run
+
+```bash
+  git clone https://github.com/ChickenLamb/Github-Issuer
+  cd Gitbub-Issuer
+  npm install
+  npm run build
+  npm run start
+```
+  go to https://localhost:3000
+    
+
+
+## Appendix/備注
+
+#### Push then github Actions automatically Deploy to CDN
+
+.github/workflows/*.yml -> github Actions -> build and export to -> branch/gh-pages -> deploy trigger to CDN(Cloudflare)
+
+#### 使用的library:
+1.MUI(CSS Framework）\
+2.axios（API call) \
+3.toastify(toasting style notify)\
+4.react/next (JavaScript Framework)
