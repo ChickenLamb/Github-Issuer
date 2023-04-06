@@ -46,7 +46,7 @@ export default function PositionedMenu({ setTag, query, SearchQuery, LoadIssue, 
     let config = {
       method: 'get',
       maxBodyLength: Infinity,
-      url: `https://github-get-token-api.vercel.app/api/delete-tag?token=` + `${token}` + '&label_url=' + `${labels_url}`,
+      url: `https://github-get-token-api.vercel.app/api/delete-tag?token=` + `${token}` + '&label_url=' + `${label_url}`,
     };
     axios.request(config)
       .then((response: any) => {
